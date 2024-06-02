@@ -12,7 +12,7 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    socket.current = new WebSocket('wss://3.39.69.254:8080/socket/chat');
+    socket.current = new WebSocket('wss://3.39.69.254:443/socket/chat');
 
     socket.current.onmessage = (event) => {
       const newMessage: Message = { text: event.data };
