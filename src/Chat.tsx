@@ -13,7 +13,7 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    socket.current = io('https://3.39.69.254');
+    socket.current = io('https://3.39.69.254/socket/chat/');
 
     socket.current.on('message', (message: string) => {
       const newMessage: Message = { text: message };
