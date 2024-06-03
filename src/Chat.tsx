@@ -1,6 +1,5 @@
 import ChatInput from './components/ChatInput';
 import React, { useEffect, useRef, useState } from 'react';
-import io, { Socket } from 'socket.io-client';
 
 interface Message {
   text: string;
@@ -9,19 +8,35 @@ interface Message {
 const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>('');
-  const socket = useRef<Socket | null>(null);
+  const socket = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    socket.current = io('https://3.39.69.254/socket/chat/');
+    try {
+      socket.current = new WebSocket('wss://3.39.69.254:443/socket/chat');
 
-    socket.current.on('message', (message: string) => {
-      const newMessage: Message = { text: message };
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-    });
+      socket.current.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+
+      socket.current.onmessage = (event) => {
+        const newMessage: Message = { text: event.data };
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      };
+
+      socket.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      socket.current.onclose = () => {
+        console.log('WebSocket connection closed');
+      };
+    } catch (error) {
+      console.error('Failed to establish WebSocket connection:', error);
+    }
 
     return () => {
-      socket.current?.disconnect();
+      socket.current?.close();
     };
   }, []);
 
@@ -31,7 +46,7 @@ const Chat = () => {
 
   const sendMessage = () => {
     if (socket.current && input) {
-      socket.current.emit('message', input);
+      socket.current.send(input);
       setInput('');
     }
   };
