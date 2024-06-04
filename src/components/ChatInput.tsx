@@ -16,6 +16,11 @@ const ChatInput = (props: ChatInputProps) => {
         placeholder="메시지를 입력하세요."
         value={props.value}
         onChange={props.onChange}
+        onKeyPress={(event) => {
+          if (event.key === 'Enter') {
+            props.onSend();
+          }
+        }}
       />
       <Button
         style={{
